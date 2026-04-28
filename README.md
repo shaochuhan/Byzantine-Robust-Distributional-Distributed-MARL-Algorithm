@@ -11,7 +11,7 @@ This repository contains the official PyTorch implementation of **Byzantine-Robu
 - **Theoretical Convergence Guarantees** under Byzantine attacks
 
 ## Framework Diagram
-![BRD²MARL Framework](https://github.com/shaochuhan/Byzantine-Robust-Distributional-Distributed-MARL-Algorithm/raw/main/framework.png)
+![D²MARL Framework](https://github.com/shaochuhan/Byzantine-Robust-Distributional-Distributed-MARL-Algorithm/raw/master/brd2marl-framework.jpg)
 
 ## Project Structure
 ```text
