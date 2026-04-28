@@ -1,69 +1,45 @@
-# Networked Multi-agent RL (NMARL)
-This repo implements the state-of-the-art MARL algorithms for networked system control, with observability and communication of each agent limited to its neighborhood. For fair comparison, all algorithms are applied to A2C agents, classified into two groups: IA2C contains non-communicative policies which utilize neighborhood information only, whereas MA2C contains communicative policies with certain communication protocols.
+# Byzantine-Robust Distributional Distributed MARL (BRD²MARL / BRD²AC)
 
-Available IA2C algorithms:
-* PolicyInferring: [Lowe, Ryan, et al. "Multi-agent actor-critic for mixed cooperative-competitive environments." Advances in Neural Information Processing Systems, 2017.](https://papers.nips.cc/paper/7217-multi-agent-actor-critic-for-mixed-cooperative-competitive-environments.pdf)
-* FingerPrint: [Foerster, Jakob, et al. "Stabilising experience replay for deep multi-agent reinforcement learning." arXiv preprint arXiv:1702.08887, 2017.](https://arxiv.org/pdf/1702.08887.pdf)
-* ConsensusUpdate: [Zhang, Kaiqing, et al. "Fully decentralized multi-agent reinforcement learning with networked agents." arXiv preprint arXiv:1802.08757, 2018.](https://arxiv.org/pdf/1802.08757.pdf)
+This repository contains the official PyTorch implementation of **Byzantine-Robust Distributional Distributed Multi-Agent Reinforcement Learning Algorithm (BRD²MARL / BRD²AC)**, a robust MARL method designed for **continuous control tasks** under communication constraints and malicious Byzantine attacks.
 
+## Key Features
+- **Byzantine Attack Resistance**: Defends against various malicious agent attacks in fully distributed MARL systems
+- **Asymmetric Robust Consensus**: Heavy-duty nonlinear filtering for Critic, lightweight trust-region for Actor
+- **Distributional Value Learning**: Models return distribution for noise-robust and stable training
+- **Wasserstein Policy Optimization**: Zero-sampling-variance gradient for reliable policy update
+- **Fully Decentralized**: No centralized controller, only neighbor-to-neighbor communication
+- **Theoretical Convergence Guarantees** under Byzantine attacks
 
-Available MA2C algorithms:
-* DIAL: [Foerster, Jakob, et al. "Learning to communicate with deep multi-agent reinforcement learning." Advances in Neural Information Processing Systems. 2016.](http://papers.nips.cc/paper/6042-learning-to-communicate-with-deep-multi-agent-reinforcement-learning.pdf)
-* CommNet: [Sukhbaatar, Sainbayar, et al. "Learning multiagent communication with backpropagation." Advances in Neural Information Processing Systems, 2016.](https://arxiv.org/pdf/1605.07736.pdf)
-* NeurComm: Inspired from [Gilmer, Justin, et al. "Neural message passing for quantum chemistry." arXiv preprint arXiv:1704.01212, 2017.](https://arxiv.org/pdf/1704.01212.pdf)
+## Framework Diagram
+![BRD²MARL Framework](https://github.com/shaochuhan/Byzantine-Robust-Distributional-Distributed-MARL-Algorithm/raw/main/framework.png)
 
-Available NMARL scenarios:
-* ATSC Grid: Adaptive traffic signal control in a synthetic traffic grid.
-* ATSC Monaco: Adaptive traffic signal control in a real-world traffic network from Monaco city.
-* CACC Catch-up: Cooperative adaptive cruise control for catching up the leadinig vehicle.
-* CACC Slow-down: Cooperative adaptive cruise control for following the leading vehicle to slow down.
+## Project Structure
+```text
+Distributional-Distributed-MARL-Algorithm/
+├── agents/         # Core agent and trainer implementations
+├── config/         # Configuration files for all environments
+├── envs/           # CACC, VMAS, and networked control environments
+├── utils.py        # Consensus, attack, and utility functions
+├── main.py         # Training, evaluation, and attack entry
+└── requirements.txt # Dependencies
+```
 
-## Requirements
-* Python3 == 3.5
-* [PyTorch](https://pytorch.org/get-started/locally/) == 1.4.0
-* [Tensorflow](http://www.tensorflow.org/install) == 2.1.0 (for tensorboard) 
-* [SUMO](http://sumo.dlr.de/wiki/Installing) >= 1.1.0
+## Getting Started
+### Train
+```bash
+python main.py --base-dir ./exp/d2marl train --config-dir ./config
+python3 main.py evaluate --config-dir ./config/brd2marl --version v1 --malicious-agents 1 --malicious-type opposite
+```
+### Evaluate
+```bash
+python3 main.py evaluate --config-dir ./config/brd2marl --version v1 --malicious-agents 1 --malicious-type opposite --evaluation-seeds 100
+```
+## Supported Byzantine Attack Types
+- Sign-flipping Attack
+- Opposite Attack
+- Random Attack
 
-## Usages
-First define all hyperparameters (including algorithm and DNN structure) in a config file under `[config_dir]` ([examples](./config)), and create the base directory of each experiement `[base_dir]`. For ATSC Grid, please call [`build_file.py`](./envs/large_grid_data) to generate SUMO network files before training.
-
-1. To train a new agent, run
-~~~
-python3 main.py --base-dir [base_dir] train --config-dir [config_dir]
-~~~
-Training config/data and the trained model will be output to `[base_dir]/data` and `[base_dir]/model`, respectively.
-
-2. To access tensorboard during training, run
-~~~
-tensorboard --logdir=[base_dir]/log
-~~~
-
-3. To evaluate a trained agent, run
-~~~
-python3 main.py --base-dir [base_dir] evaluate --evaluation-seeds [seeds]
-~~~
-Evaluation data will be output to `[base_dir]/eva_data`. Make sure evaluation seeds are different from those used in training.    
-
-4. To visualize the agent behavior in ATSC scenarios, run
-~~~
-python3 main.py --base-dir [base_dir] evaluate --evaluation-seeds [seed] --demo
-~~~
-It is recommended to use only one evaluation seed for the demo run. This will launch the SUMO GUI, and [`view.xml`](./envs/large_grid_data) can be applied to visualize queue length and intersectin delay in edge color and thickness. 
-
-## Reproducibility
-The paper results are based on an out-of-date SUMO version 0.32.0. We are re-running the experiments with SUMO 1.2.0 and will update the results soon. The pytorch impelmention is avaliable at branch [pytorch](https://github.com/cts198859/deeprl_network/tree/pytorch).
-
-## Citation
-For more implementation details and underlying reasonings, please check our paper [Multi-agent Reinforcement Learning for Networked System Control](https://openreview.net/forum?id=Syx7A3NFvH).
-~~~
-@inproceedings{
-chu2020multiagent,
-title={Multi-agent Reinforcement Learning for Networked System Control},
-author={Tianshu Chu and Sandeep Chinchali and Sachin Katti},
-booktitle={International Conference on Learning Representations},
-year={2020},
-url={https://openreview.net/forum?id=Syx7A3NFvH}
-}
-~~~
-
-
+## Supported Environments
+- Cooperative Adaptive Cruise Control (CACC)
+- Vectorized Multi-Agent Simulator (VMAS)
+- Networked System Control with Byzantine Agents
